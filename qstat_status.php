@@ -8,6 +8,12 @@
     ***************************************************************************/
    /* Change log:
 
+Release 0.10 (moved to github) ) July, 25th 2023.
+Moved repository to github
+Changed all list..each to foreach(array key => item) as each() function was 
+deprecated in php 8.
+Check if $ladNodes[$clusterToShow] is set prior to count (php 8 compatibility)
+
 Release 0.9 (CVS = 1.25) ) October, 16th 2016.
 Fixed the way "checktime" function deals with months. The array must contain an
 strings representing the numbers of the months. They must be explycit strings,
@@ -146,7 +152,8 @@ $qstat_path = $torque_path . "/bin/qstat";
 //$ssh_connection_string = "ssh user@hostname ";
 //$ssh_connection_string = "ssh host1 ssh host2 ";
 
-$ssh_connection_string = "";
+$ssh_connection_string = "ssh marfim ";
+//$ssh_connection_string = "";
 
 ini_set('memory_limit', 67108864);
 
@@ -250,7 +257,8 @@ $qstat = `$commandLine`;
 //////////////////////////////////////////////////////// Informacoes dos grupos
 $groupsInfo = stripLineBreaks($groupsInfo, "<|>");
 $groupsInfo = explode("<|>", $groupsInfo);
-while (list($key, $group) = each($groupsInfo)){
+//while (list($key, $group) = each($groupsInfo)){
+foreach($groupsInfo as $key => $group){
   $group = explode(":", $group);
   if (count($group)>1){
     $groups[$group[2]]['name']  = $group[0];
@@ -263,7 +271,8 @@ while (list($key, $group) = each($groupsInfo)){
 ///////////////////////////////////////////////// Informacoes sobre os usuarios
 $usersInfo = stripLineBreaks($usersInfo, "<|>");
 $usersInfo = explode("<|>", $usersInfo);
-while (list($key, $user) = each($usersInfo)){
+//while (list($key, $user) = each($usersInfo)){
+foreach($usersInfo as $key => $user){
   $user = explode(":", $user);
   $users[$user[0]]['username']  = $user[0];
   if (count($user)>1){
@@ -325,7 +334,8 @@ foreach ($qstat as $job){
   $jobs[] = explode("<|>", $job);
 }
 
-while (list($key, $job) = each($jobs)){
+//while (list($key, $job) = each($jobs)){
+foreach($jobs as $key => $job){
   $jobId = explode(".", $job[0]);
   $jobs[$key]['id'] = $jobId[0];
   foreach ($job as $property){
@@ -352,7 +362,7 @@ while (list($key, $job) = each($jobs)){
 
 echo "\n" . $columnDelimiter;
 if ($showVersion)
-  echo "========================================[Torque qstat/pbsnodes wrapper v0.9]==";
+  echo "=======================================[Torque qstat/pbsnodes wrapper v0.10]==";
  else
    echo "##############################################################################";
 echo $columnDelimiter . "\n";
@@ -399,7 +409,11 @@ foreach ($clustersToShow as $clusterToShow){
   echo "" . $columnDelimiter . "\n" . $columnDelimiter . "";
   $i = 0; $toEcho = ""; $k=0;
   //if (isset($ladNodes))
+
+  if (isset($ladNodes[$clusterToShow]))
     $nroNodes = count($ladNodes[$clusterToShow]);
+  else
+    $nroNodes = 0;
   //else
   //  $nroNodes = 0;
   if (isset($ladNodes[$clusterToShow]))
